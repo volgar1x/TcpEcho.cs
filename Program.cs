@@ -2,12 +2,10 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 public static class Program
 {
-
-    public async static void Main(string[] args)
+    public static void Main(string[] args)
     {
         var listener = new TcpListener(IPAddress.Any, 5555);
         Console.WriteLine("listening on 0.0.0.0:5555");
@@ -18,9 +16,7 @@ public static class Program
     
     public async static void Loop(TcpListener listener)
     {
-        var client = await listener.AcceptTcpClientAsync();
-        Console.WriteLine("one client accepted");
-        Handle(client);
+        Handle(await listener.AcceptTcpClientAsync());
         Loop(listener);
     }
     
@@ -28,6 +24,8 @@ public static class Program
     {
         using (var stream = client.GetStream())
         {
+            Console.WriteLine("one client accepted");
+        
             var buf = new byte[1024];
         
             while (client.Connected)
@@ -46,7 +44,7 @@ public static class Program
                     break;
                 }
                 
-                stream.WriteAsync(buf, 0, length);
+                stream.Write(buf, 0, length);
             }
             
             Console.WriteLine("one client exited");
